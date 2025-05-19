@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sentiment Analysis Demo</title>
+  </head>
+  <body>
+    <h2>Sentiment Analysis</h2>
+    <form id="textForm">
+      <textarea
+        id="textInput"
+        rows="4"
+        cols="50"
+        placeholder="Enter your text here..."
+      ></textarea
+      ><br />
+      <button type="submit">Analyze</button>
+    </form>
+    <p id="result"></p>
+
+    <div id="feedback" style="display: none">
+      <p>Was the prediction correct?</p>
+      <button onclick="sendFeedback('Positive')">Positive</button>
+      <button onclick="sendFeedback('Negative')">Negative</button>
+    </div>
+
+    <script>
+      let lastText = "";
+      document
+        .getElementById("textForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const text = document.getElementById("textInput").value;
+          lastText = text;
+          const res = await fetch("/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text }),
+          });
+          const data = await res.json();
+          document.getElementById("result").innerText =
+            "Prediction: " + data.label + " (Score: " + data.score + ")";
+          document.getElementById("feedback").style.display = "block";
+        });
+
+      async function sendFeedback(label) {
+        await fetch("/feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: lastText, label }),
+        });
+        alert("Thank you! Your feedback has been submitted.");
+        document.getElementById("feedback").style.display = "none";
+      }
+    </script>
+  </body>
+</html>
