@@ -1,4 +1,3 @@
-fastapi
-uvicorn
-transformers
-torch
+Flask
+flask-cors
+scikit-learn
